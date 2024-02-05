@@ -55,11 +55,11 @@ class Extractor {
         try {
           await fs.mkdir(destDir, { recursive: true })
 
-          const canonicalDestDir = await fs.realpath(destDir)
-          const relativeDestDir = path.relative(this.opts.dir, canonicalDestDir)
+          const resolvedDestDir = path.resolve(destDir)
+          const relativeDestDir = path.relative(this.opts.dir, resolvedDestDir)
 
           if (relativeDestDir.split(path.sep).includes('..')) {
-            throw new Error(`Out of bound path "${canonicalDestDir}" found while processing file ${entry.fileName}`)
+            throw new Error(`Out of bound path "${resolvedDestDir}" found while processing file ${entry.fileName}`)
           }
 
           await this.extractEntry(entry)
@@ -168,6 +168,6 @@ module.exports = async function (zipPath, opts) {
   }
 
   await fs.mkdir(opts.dir, { recursive: true })
-  opts.dir = await fs.realpath(opts.dir)
+  opts.dir = path.resolve(opts.dir)
   return new Extractor(zipPath, opts).extract()
 }
