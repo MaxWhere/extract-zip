@@ -1,6 +1,6 @@
 {
   "name": "@mxw/extract-zip",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "unzip a zip file into a directory using 100% javascript",
   "main": "index.js",
   "types": "index.d.ts",
