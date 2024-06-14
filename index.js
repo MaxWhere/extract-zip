@@ -1,6 +1,6 @@
 const debug = require('debug')('extract-zip')
 // eslint-disable-next-line node/no-unsupported-features/node-builtins
-const { createWriteStream, promises: fs } = require('fs')
+const { createWriteStream, realpathSync, promises: fs } = require('fs')
 const getStream = require('get-stream')
 const path = require('path')
 const { promisify } = require('util')
@@ -55,11 +55,11 @@ class Extractor {
         try {
           await fs.mkdir(destDir, { recursive: true })
 
-          const resolvedDestDir = path.resolve(destDir)
-          const relativeDestDir = path.relative(this.opts.dir, resolvedDestDir)
+          const canonicalDestDir = realpathSync(destDir)
+          const relativeDestDir = path.relative(this.opts.dir, canonicalDestDir)
 
           if (relativeDestDir.split(path.sep).includes('..')) {
-            throw new Error(`Out of bound path "${resolvedDestDir}" found while processing file ${entry.fileName}`)
+            throw new Error(`Out of bound path "${canonicalDestDir}" found while processing file ${entry.fileName}`)
           }
 
           await this.extractEntry(entry)
@@ -168,6 +168,6 @@ module.exports = async function (zipPath, opts) {
   }
 
   await fs.mkdir(opts.dir, { recursive: true })
-  opts.dir = path.resolve(opts.dir)
+  opts.dir = realpathSync(opts.dir)
   return new Extractor(zipPath, opts).extract()
 }
